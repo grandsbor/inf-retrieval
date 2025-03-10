@@ -1,2 +1,2 @@
 # inf-retrieval
-Materials for the Information Retrieval Course
+Это материалы к курсу &laquo;Теория Информационного поиска&raquo;, который читается на филологическом факультете СПбГУ с 2024 г.
