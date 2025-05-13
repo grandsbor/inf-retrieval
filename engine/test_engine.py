@@ -29,6 +29,8 @@ def collection2(tmp_path_factory):
             "С высокой яблони на Ньютона упало яблоко.")
     add_doc(root, "doc2",
             "Для яблок характерно высокое содержание пищевых волокон.")
+    add_doc(root, "doc3",
+            "Яблоки были зеленые и твердые.")
     return root
 
 
@@ -75,7 +77,7 @@ def test_search_single_term(collection1):
 def test_search_bool_and(collection2):
     idxr = Indexer(collection2, TEST_INDEX)
     s = BaseSearcher(TEST_INDEX)
-    assert sorted(s.search("яблоко")) == [0, 1]
+    assert sorted(s.search("яблоко")) == [0, 1, 2]
     assert sorted(s.search("высокий AND высокий")) == [0, 1]
     assert sorted(s.search("высокий AND яблоко")) == [0, 1]
     assert s.search("высокий AND упасть") == [0]
@@ -83,3 +85,31 @@ def test_search_bool_and(collection2):
     assert s.search("высокий AND низкий") == []
     with pytest.raises(AssertionError):
         s.search("высокий яблоня")
+
+
+@pytest.mark.skip
+def test_search_bool_or(collection2):
+    idxr = Indexer(collection2, TEST_INDEX)
+    s = BaseSearcher(TEST_INDEX)
+    assert sorted(s.search("высокий OR высокий")) == [0, 1]
+    assert sorted(s.search("высокий OR зелёный")) == [0, 1, 2]
+    assert sorted(s.search("твёрдый OR зелёный")) == [2]
+    assert sorted(s.search("синий OR зелёный")) == [2]
+
+
+@pytest.mark.skip
+def test_multiple_parses(collection2):
+    idxr = Indexer(collection2, TEST_INDEX)
+    s = BaseSearcher(TEST_INDEX)
+    assert sorted(s.search("яблоко AND быть")) == [2]
+    assert sorted(s.search("яблоко AND быль")) == [2]
+
+
+@pytest.mark.skip
+def test_return_doc_names(collection2):
+    idxr = Indexer(collection2, TEST_INDEX)
+    s = BaseSearcher(TEST_INDEX)
+    assert sorted(s.search("яблоко", use_doc_names=True)) \
+        == ["doc1.txt", "doc2.txt", "doc3.txt"]
+    assert sorted(s.search("высокий AND яблоко", use_doc_names=True)) \
+        == ["doc1.txt", "doc2.txt"]
