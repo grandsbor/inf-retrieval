@@ -34,6 +34,7 @@ def collection2(tmp_path_factory):
     return root
 
 
+@pytest.mark.hw1
 def test_empty_index():
     i = Index()
     i.save(TEST_INDEX)
@@ -44,6 +45,7 @@ def test_empty_index():
     assert i2.get('слово') == []
 
 
+@pytest.mark.hw1
 def test_doc_no():
     i = Index()
     assert i.add_doc("doc0") == 0
@@ -55,6 +57,7 @@ def test_doc_no():
     assert i2.add_doc("doc2") == 2
 
 
+@pytest.mark.hw1
 def test_index_base(collection1):
     idxr = Indexer(collection1, TEST_INDEX)
     assert os.path.isfile(TEST_INDEX)
@@ -64,6 +67,7 @@ def test_index_base(collection1):
     assert len(i.index) == 5
 
 
+@pytest.mark.hw1
 def test_search_single_term(collection1):
     idxr = Indexer(collection1, TEST_INDEX)
     s = BaseSearcher(TEST_INDEX)
@@ -74,6 +78,7 @@ def test_search_single_term(collection1):
     assert s.search("коллекция") == [0]
 
 
+@pytest.mark.hw1
 def test_search_bool_and(collection2):
     idxr = Indexer(collection2, TEST_INDEX)
     s = BaseSearcher(TEST_INDEX)
@@ -87,6 +92,7 @@ def test_search_bool_and(collection2):
         s.search("высокий яблоня")
 
 
+@pytest.mark.hw1
 @pytest.mark.skip
 def test_search_bool_or(collection2):
     idxr = Indexer(collection2, TEST_INDEX)
@@ -97,6 +103,7 @@ def test_search_bool_or(collection2):
     assert sorted(s.search("синий OR зелёный")) == [2]
 
 
+@pytest.mark.hw1
 @pytest.mark.skip
 def test_multiple_parses(collection2):
     idxr = Indexer(collection2, TEST_INDEX)
@@ -105,6 +112,7 @@ def test_multiple_parses(collection2):
     assert sorted(s.search("яблоко AND быль")) == [2]
 
 
+@pytest.mark.hw1
 @pytest.mark.skip
 def test_return_doc_names(collection2):
     idxr = Indexer(collection2, TEST_INDEX)
@@ -115,6 +123,7 @@ def test_return_doc_names(collection2):
         == ["doc1.txt", "doc2.txt"]
 
 
+@pytest.mark.hw1
 @pytest.mark.skip
 def test_stopwords(collection2):
     stopwords = ['для', 'и', 'на', 'с']
@@ -131,6 +140,7 @@ def test_stopwords(collection2):
     assert s.search("яблоко") == [0, 1, 2]
 
 
+@pytest.mark.hw1
 @pytest.mark.skip
 def test_stopwords_normalization(collection2):
     idxr = Indexer(collection2, TEST_INDEX, stopwords=['быть'])
