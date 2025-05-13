@@ -3,17 +3,34 @@ import pytest
 
 from index import Index
 from indexer import Indexer
+from searcher import BaseSearcher
 
 
 TEST_INDEX = 'test_index.inv'
 
 
+def add_doc(root, name: str, content: str):
+    with open(root / f"{name}.txt", "w") as fw1:
+        fw1.write(content)
+
+
 @pytest.fixture(scope="session")
-def collection(tmp_path_factory):
-    root = tmp_path_factory.mktemp("collection")
-    with open(root / "doc1.txt", "w") as fw1:
-        fw1.write("Первый документ в коллекции")
+def collection1(tmp_path_factory):
+    root = tmp_path_factory.mktemp("collection1")
+    add_doc(root, "doc1",
+            "Первый документ в коллекции. Важный документ.")
     return root
+
+
+@pytest.fixture(scope="session")
+def collection2(tmp_path_factory):
+    root = tmp_path_factory.mktemp("collection2")
+    add_doc(root, "doc1",
+            "С высокой яблони на Ньютона упало яблоко.")
+    add_doc(root, "doc2",
+            "Для яблок характерно высокое содержание пищевых волокон.")
+    return root
+
 
 def test_empty_index():
     i = Index()
@@ -23,7 +40,7 @@ def test_empty_index():
     i2 = Index()
     i2.load(TEST_INDEX)
     assert i2.get('слово') == []
-    os.remove(TEST_INDEX)
+
 
 def test_doc_no():
     i = Index()
@@ -35,11 +52,34 @@ def test_doc_no():
     i2.load(TEST_INDEX)
     assert i2.add_doc("doc2") == 2
 
-def test_indexer(collection):
-    idxr = Indexer(collection, TEST_INDEX)
+
+def test_index_base(collection1):
+    idxr = Indexer(collection1, TEST_INDEX)
     assert os.path.isfile(TEST_INDEX)
     i = Index()
     i.load(TEST_INDEX)
     assert len(i.docs) == 1
-    assert len(i.index) == 4
-    os.remove(TEST_INDEX)
+    assert len(i.index) == 5
+
+
+def test_search_single_term(collection1):
+    idxr = Indexer(collection1, TEST_INDEX)
+    s = BaseSearcher(TEST_INDEX)
+    assert s.search("слово") == []
+    assert s.search("документ") == [0]
+    # test normalization
+    assert s.search("Документ") == [0]
+    assert s.search("коллекция") == [0]
+
+
+def test_search_bool_and(collection2):
+    idxr = Indexer(collection2, TEST_INDEX)
+    s = BaseSearcher(TEST_INDEX)
+    assert sorted(s.search("яблоко")) == [0, 1]
+    assert sorted(s.search("высокий AND высокий")) == [0, 1]
+    assert sorted(s.search("высокий AND яблоко")) == [0, 1]
+    assert s.search("высокий AND упасть") == [0]
+    assert s.search("высокий AND ньютон AND на") == [0]
+    assert s.search("высокий AND низкий") == []
+    with pytest.raises(AssertionError):
+        s.search("высокий яблоня")
