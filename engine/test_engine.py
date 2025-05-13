@@ -113,3 +113,27 @@ def test_return_doc_names(collection2):
         == ["doc1.txt", "doc2.txt", "doc3.txt"]
     assert sorted(s.search("высокий AND яблоко", use_doc_names=True)) \
         == ["doc1.txt", "doc2.txt"]
+
+
+@pytest.mark.skip
+def test_stopwords(collection2):
+    stopwords = ['для', 'и', 'на', 'с']
+    idxr = Indexer(collection2, TEST_INDEX, stopwords=stopwords)
+
+    i = Index()
+    i.load(TEST_INDEX)
+    assert i.get('и') == []
+
+    s = BaseSearcher(TEST_INDEX, stopwords=stopwords)
+    assert sorted(s.search("для AND яблоко")) == [0, 1, 2]
+    assert sorted(s.search("высокий AND яблоко")) == [0, 1]
+    assert s.search("и") == []
+    assert s.search("яблоко") == [0, 1, 2]
+
+
+@pytest.mark.skip
+def test_stopwords_normalization(collection2):
+    idxr = Indexer(collection2, TEST_INDEX, stopwords=['быть'])
+    s = BaseSearcher(TEST_INDEX, stopwords=['быть'])
+    assert sorted(s.search("быть AND яблоко")) == [0, 1, 2]
+    assert s.search("быль AND яблоко") == [2]

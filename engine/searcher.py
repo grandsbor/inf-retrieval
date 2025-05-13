@@ -2,7 +2,7 @@ from index import Index
 
 
 class BaseSearcher:
-    def __init__(self, index_path: str):
+    def __init__(self, index_path: str, stopwords=None):
         self.index = Index()
         self.index.load(index_path)
 

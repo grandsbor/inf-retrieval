@@ -6,7 +6,7 @@ from index import Index
 
 
 class Indexer:
-    def __init__(self, path: str, index_path='index.inv'):
+    def __init__(self, path: str, index_path='index.inv', stopwords=None):
         index = Index()
         for fname in sorted(os.listdir(path)):
             if not fname.endswith('.txt'):
