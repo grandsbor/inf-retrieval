@@ -1,4 +1,4 @@
-from index import Index
+from index import Index, PositionalIndex
 
 
 class BaseSearcher:
@@ -14,13 +14,17 @@ class BaseSearcher:
 
     def search(self, query: str, use_doc_names: bool = False) -> list[int]:
         tokens = query.lower().split()
-        if len(tokens) == 1:
-            return self.index.get(tokens[0])
         assert len(tokens) % 2 == 1
+        op = tokens[1] if len(tokens) > 1 else "and"
         terms = tokens[::2]
-        op = tokens[1]
         if op == "and":
             return self.search_and(terms)
+
+
+class PositionalSearcher(BaseSearcher):
+    def __init__(self, index_path: str, stopwords=None):
+        self.index = PositionalIndex()
+        self.index.load(index_path)
 
 
 if __name__ == "__main__":

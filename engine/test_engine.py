@@ -1,9 +1,9 @@
 import os
 import pytest
 
-from index import Index
-from indexer import Indexer
-from searcher import BaseSearcher
+from index import Index, PositionalIndex
+from indexer import Indexer, PositionalIndexer
+from searcher import BaseSearcher, PositionalSearcher
 
 
 TEST_INDEX = 'test_index.inv'
@@ -34,7 +34,7 @@ def collection2(tmp_path_factory):
     return root
 
 
-@pytest.mark.hw1
+@pytest.mark.base
 def test_empty_index():
     i = Index()
     i.save(TEST_INDEX)
@@ -45,7 +45,7 @@ def test_empty_index():
     assert i2.get('слово') == []
 
 
-@pytest.mark.hw1
+@pytest.mark.base
 def test_doc_no():
     i = Index()
     assert i.add_doc("doc0") == 0
@@ -57,20 +57,28 @@ def test_doc_no():
     assert i2.add_doc("doc2") == 2
 
 
-@pytest.mark.hw1
-def test_index_base(collection1):
-    idxr = Indexer(collection1, TEST_INDEX)
+@pytest.mark.base
+@pytest.mark.parametrize(
+    "indexer_cls,index_cls",
+    [(Indexer, Index), (PositionalIndexer, PositionalIndex)]
+)
+def test_index_base(collection1, indexer_cls, index_cls):
+    idxr = indexer_cls(collection1, TEST_INDEX)
     assert os.path.isfile(TEST_INDEX)
-    i = Index()
+    i = index_cls()
     i.load(TEST_INDEX)
     assert len(i.docs) == 1
     assert len(i.index) == 5
 
 
-@pytest.mark.hw1
-def test_search_single_term(collection1):
-    idxr = Indexer(collection1, TEST_INDEX)
-    s = BaseSearcher(TEST_INDEX)
+@pytest.mark.base
+@pytest.mark.parametrize(
+    "indexer_cls,searcher_cls",
+    [(Indexer, BaseSearcher), (PositionalIndexer, PositionalSearcher)]
+)
+def test_search_single_term(collection1, indexer_cls, searcher_cls):
+    idxr = indexer_cls(collection1, TEST_INDEX)
+    s = searcher_cls(TEST_INDEX)
     assert s.search("слово") == []
     assert s.search("документ") == [0]
     # test normalization
@@ -78,10 +86,14 @@ def test_search_single_term(collection1):
     assert s.search("коллекция") == [0]
 
 
-@pytest.mark.hw1
-def test_search_bool_and(collection2):
-    idxr = Indexer(collection2, TEST_INDEX)
-    s = BaseSearcher(TEST_INDEX)
+@pytest.mark.base
+@pytest.mark.parametrize(
+    "indexer_cls,searcher_cls",
+    [(Indexer, BaseSearcher), (PositionalIndexer, PositionalSearcher)]
+)
+def test_search_bool_and(collection2, indexer_cls, searcher_cls):
+    idxr = indexer_cls(collection2, TEST_INDEX)
+    s = searcher_cls(TEST_INDEX)
     assert sorted(s.search("яблоко")) == [0, 1, 2]
     assert sorted(s.search("высокий AND высокий")) == [0, 1]
     assert sorted(s.search("высокий AND яблоко")) == [0, 1]
