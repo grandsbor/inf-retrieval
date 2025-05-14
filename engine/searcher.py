@@ -24,26 +24,31 @@ class BaseSearcher:
         terms = tokens[::2]
         return self._search(op, terms)
 
+
 class PositionalSearcher(BaseSearcher):
-    def __init__(self, index_path: str, stopwords=None):
+    def __init__(self, index_path: str, stopwords=None, range_pos=False):
         self.index = PositionalIndex()
         self.index.load(index_path)
+        self.range_pos = range_pos
+
+    def _search_pos(self, terms: list[str], dist: int) -> list[int]:
+        result = []
+        docs1 = self.index.get(terms[0])
+        docs2 = self.index.get(terms[1])
+        for (doc_no, pos1) in docs1.items():
+            pos2 = docs2.get(doc_no)
+            if pos2:
+                pos2_set: set[int] = set(pos2)
+                for p in pos1:
+                    if p + dist in pos2_set:
+                        result.append(doc_no)
+        return result
 
     def _search(self, op: str, terms: list[str]) -> list[int]:
         if op[0] == '/':
             assert len(terms) == 2
             dist = int(op[1:])
-            result = []
-            docs1 = self.index.get(terms[0])
-            docs2 = self.index.get(terms[1])
-            for (doc_no, pos1) in docs1.items():
-                pos2 = docs2.get(doc_no)
-                if pos2:
-                    pos2_set: set[int] = set(pos2)
-                    for p in pos1:
-                        if (p + dist) in pos2_set:
-                            result.append(doc_no)
-            return result
+            return self._search_pos(terms, dist)
         return super()._search(op, terms)
 
 

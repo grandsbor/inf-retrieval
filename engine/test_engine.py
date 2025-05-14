@@ -173,4 +173,31 @@ def test_distance_basic(collection2):
     assert sorted(s.search("яблоко /5 волокно")) == [1]
     assert sorted(s.search("зелёный /2 твёрдый")) == [2]
     assert sorted(s.search("высокий /-2 яблоко")) == [1]
+    assert sorted(s.search("высокий /-1 яблоня")) == []
     assert sorted(s.search("волокно /-2 содержание")) == [1]
+
+
+@pytest.mark.hw2
+@pytest.mark.skip
+def test_distance_signed(collection2):
+    idxr = PositionalIndexer(collection2, TEST_INDEX)
+    s = PositionalSearcher(TEST_INDEX)
+    assert sorted(s.search("высокий /+1 яблоня")) == [0]
+    assert sorted(s.search("высокий /2 яблоко")) == [1]
+    assert sorted(s.search("высокий /+2 яблоко")) == []
+    assert sorted(s.search("яблоко /+5 волокно")) == [1]
+    assert sorted(s.search("яблоко /-5 волокно")) == []
+    assert sorted(s.search("яблоко /5 волокно")) == [1]
+    assert sorted(s.search("волокно /5 яблоко")) == [1]
+
+
+@pytest.mark.hw2
+@pytest.mark.skip
+def test_distance_range(collection2):
+    idxr = PositionalIndexer(collection2, TEST_INDEX)
+    s = PositionalSearcher(TEST_INDEX, range_pos=True)
+    assert sorted(s.search("высокий /5 яблоко")) == [0, 1]
+    assert sorted(s.search("высокий /+5 яблоко")) == [0]
+    assert sorted(s.search("высокий /-3 яблоко")) == [1]
+    assert sorted(s.search("зелёный /-3 яблоко")) == [2]
+    assert sorted(s.search("яблоко /20 волокно")) == [1]
