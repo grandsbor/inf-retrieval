@@ -159,3 +159,18 @@ def test_stopwords_normalization(collection2):
     s = BaseSearcher(TEST_INDEX, stopwords=['быть'])
     assert sorted(s.search("быть AND яблоко")) == [0, 1, 2]
     assert s.search("быль AND яблоко") == [2]
+
+
+@pytest.mark.base
+def test_distance_basic(collection2):
+    idxr = PositionalIndexer(collection2, TEST_INDEX)
+    s = PositionalSearcher(TEST_INDEX)
+    assert sorted(s.search("высокий /1 высокий")) == []
+    assert sorted(s.search("высокий /1 яблоня")) == [0]
+    assert sorted(s.search("высокий /1 яблоко")) == []
+    assert sorted(s.search("содержание /1 волокно")) == []
+    assert sorted(s.search("содержание /2 волокно")) == [1]
+    assert sorted(s.search("яблоко /5 волокно")) == [1]
+    assert sorted(s.search("зелёный /2 твёрдый")) == [2]
+    assert sorted(s.search("высокий /-2 яблоко")) == [1]
+    assert sorted(s.search("волокно /-2 содержание")) == [1]

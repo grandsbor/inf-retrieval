@@ -57,6 +57,14 @@ class PositionalIndex(Index):
     def get(self, term: str) -> dict[int, list[int]]:
         return self.index.get(term, {})
 
+    def save(self, fname: str):
+        with open(fname, 'w') as fh:
+            json.dump({
+                'index': self.index,
+                'title_index': self.title_index,
+                'docs': self.docs,
+            }, fh)
+
     def load(self, fname: str):
         with open(fname) as fh:
             temp = json.load(fh)
@@ -64,3 +72,6 @@ class PositionalIndex(Index):
             for term, posting in temp['index'].items():
                 for doc_no, positions in posting.items():
                     self.index[term][int(doc_no)] = positions
+            for term, posting in temp['title_index'].items():
+                for doc_no, positions in posting.items():
+                    self.title_index[term][int(doc_no)] = positions
