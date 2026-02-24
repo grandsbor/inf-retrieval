@@ -1,0 +1,3 @@
+*.pdfpc
+slides/_extensions
+slides/diagram.lua
