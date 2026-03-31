@@ -198,6 +198,8 @@ def test_distance_range(collection2):
     s = PositionalSearcher(TEST_INDEX, range_pos=True)
     assert sorted(s.search("высокий /5 яблоко")) == [0, 1]
     assert sorted(s.search("высокий /+5 яблоко")) == [0]
+    assert sorted(s.search("высокий /+2 яблоко")) == []
+    assert sorted(s.search("высокий /2 яблоко")) == [1]
     assert sorted(s.search("высокий /-3 яблоко")) == [1]
     assert sorted(s.search("зелёный /-3 яблоко")) == [2]
     assert sorted(s.search("яблоко /20 волокно")) == [1]
