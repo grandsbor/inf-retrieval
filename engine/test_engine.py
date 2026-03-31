@@ -105,7 +105,6 @@ def test_search_bool_and(collection2, indexer_cls, searcher_cls):
 
 
 @pytest.mark.hw1
-@pytest.mark.skip
 def test_search_bool_or(collection2):
     idxr = Indexer(collection2, TEST_INDEX)
     s = BaseSearcher(TEST_INDEX)
@@ -116,7 +115,6 @@ def test_search_bool_or(collection2):
 
 
 @pytest.mark.hw1
-@pytest.mark.skip
 def test_multiple_parses(collection2):
     idxr = Indexer(collection2, TEST_INDEX)
     s = BaseSearcher(TEST_INDEX)
@@ -125,7 +123,6 @@ def test_multiple_parses(collection2):
 
 
 @pytest.mark.hw1
-@pytest.mark.skip
 def test_return_doc_names(collection2):
     idxr = Indexer(collection2, TEST_INDEX)
     s = BaseSearcher(TEST_INDEX)
@@ -136,7 +133,6 @@ def test_return_doc_names(collection2):
 
 
 @pytest.mark.hw1
-@pytest.mark.skip
 def test_stopwords(collection2):
     stopwords = ['для', 'и', 'на', 'с']
     idxr = Indexer(collection2, TEST_INDEX, stopwords=stopwords)
@@ -153,7 +149,6 @@ def test_stopwords(collection2):
 
 
 @pytest.mark.hw1
-@pytest.mark.skip
 def test_stopwords_normalization(collection2):
     idxr = Indexer(collection2, TEST_INDEX, stopwords=['быть'])
     s = BaseSearcher(TEST_INDEX, stopwords=['быть'])
@@ -178,7 +173,6 @@ def test_distance_basic(collection2):
 
 
 @pytest.mark.hw2
-@pytest.mark.skip
 def test_distance_signed(collection2):
     idxr = PositionalIndexer(collection2, TEST_INDEX)
     s = PositionalSearcher(TEST_INDEX)
@@ -192,7 +186,6 @@ def test_distance_signed(collection2):
 
 
 @pytest.mark.hw2
-@pytest.mark.skip
 def test_distance_range(collection2):
     idxr = PositionalIndexer(collection2, TEST_INDEX)
     s = PositionalSearcher(TEST_INDEX, range_pos=True)
