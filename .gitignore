@@ -1,3 +1,5 @@
 *.pdfpc
 slides/_extensions
 slides/diagram.lua
+engine/__pycache__
+engine/test_index.inv
