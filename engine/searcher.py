@@ -1,4 +1,4 @@
-from index import Index, PositionalIndex
+from index import Index, PositionalIndex, VectorizedIndex
 
 
 class BaseSearcher:
@@ -50,6 +50,23 @@ class PositionalSearcher(BaseSearcher):
             dist = int(op[1:])
             return self._search_pos(terms, dist)
         return super()._search(op, terms)
+
+
+class VectorizedSearcher(BaseSearcher):
+    K = 20
+
+    def __init__(self, index_path: str):
+        self.index = VectorizedIndex()
+        self.index.load(index_path)
+
+    def search(self, query: str, use_doc_names: bool = False) -> list[int]:
+        tokens = query.lower().split()
+        q = self.index.vectorize(tokens)
+        scores = {}
+        for doc_no in range(len(self.index.docs)):
+            rel = self.index.get_score(q, doc_no)
+            scores[doc_no] = rel
+        return sorted(scores, key=scores.get, reverse=True)[:self.K]
 
 
 if __name__ == "__main__":
