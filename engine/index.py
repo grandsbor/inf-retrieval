@@ -87,7 +87,7 @@ class VectorizedIndex(PositionalIndex):
     def tfidf(term: str, freq: int) -> float:
         tf = 1
         # YOUR CODE HERE
-        idf = math.log(len(self.index) / (len(self.get(term)) + 1))
+        idf = math.log(len(self.docs) / (len(self.get(term)) + 1))
         return tf * idf
 
     def _vec(self, freqs: dict[str, int]):
